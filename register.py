@@ -2,7 +2,6 @@ class Register_16_bit:
     def __init__(self, name):
         self.H = Register_8_bit(name, 'H')
         self.L = Register_8_bit(name, 'L')
-        self.type = '16_bit'
         self.name = name
 
     def __getitem__(self, idx):
@@ -25,15 +24,15 @@ class Register_16_bit:
         return 16
 
     def register(self):
-        return self.H.reg + self.L.reg
+        register = self.H.reg + self.L.reg
+        str_register = ''.join(str(bit) for bit in register)
+        return str_register
 
 
 class Register_8_bit:
     def __init__(self, name, half):
         self.name = name + half
-        self.type = '8_bit'
-        self.reg = [1, 0, 0, 0,
-                    0, 0, 0, 1]
+        self.reg = [1, 0, 0, 0, 0, 0, 0, 1]
 
     def __getitem__(self, idx):
         return self.reg[idx]
@@ -45,10 +44,11 @@ class Register_8_bit:
         return 8
 
     def register(self):
-        return self.reg
+        str_register = ''.join(str(bit) for bit in self.reg)
+        return str_register
 
 
 if __name__ == '__main__':
-    A = Register_16_bit()
+    A = Register_16_bit('A')
     A[1] = 1
     print(A[7])

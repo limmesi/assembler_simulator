@@ -1,7 +1,6 @@
 from PySide6.QtWidgets import *
 from PySide6.QtCore import *
 from PySide6.QtGui import *
-from register import *
 from utils import *
 import sys
 
@@ -16,6 +15,7 @@ class MainWindow(QWidget):
         self.text_edit = QPlainTextEdit()
         self.line_numbers = QTextEdit()
         self.terminal = QTextEdit()
+        self.terminal_label = QLabel("Terminal")
         self.selection = QTextEdit.ExtraSelection()
         self.ui_init()
 
@@ -42,6 +42,7 @@ class MainWindow(QWidget):
         self.line_numbers.setPlainText('1')
 
         self.terminal.setReadOnly(True)
+        self.terminal.setFixedHeight(150)
 
         self.selection.format.setBackground(QColor('#616161'))
         self.selection.format.setProperty(QTextFormat.FullWidthSelection, True)
@@ -59,6 +60,7 @@ class MainWindow(QWidget):
         main_layout = QVBoxLayout()
         main_layout.addLayout(button_layout)
         main_layout.addLayout(text_layout)
+        main_layout.addWidget(self.terminal_label, Qt.AlignCenter)
         main_layout.addWidget(self.terminal)
         self.setLayout(main_layout)
 
@@ -121,6 +123,8 @@ class MainWindow(QWidget):
             self.step_num += 1
 
     def parser(self, line):
+        if len(line) == 0:
+            return
         commands = line.split(' ')
         commands[1] = commands[1][:-1]
         match commands[1][0]:

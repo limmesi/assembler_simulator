@@ -35,10 +35,8 @@ def MOV(A, B):
 
 
 if __name__ == '__main__':
-    Ax = Register_16_bit()
-    Bx = Register_16_bit()
-    # print(Ax.register())
-    # print(Bx.register())
+    Ax = Register_16_bit('A')
+    Bx = Register_16_bit('B')
     Ax[7] = 0
     Ax[8] = 0
     print(Ax.register())
