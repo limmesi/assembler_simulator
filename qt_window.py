@@ -9,7 +9,16 @@ import sys
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
+        self.run_button = QPushButton("Run")
+        self.step_button = QPushButton("Step")
+        self.load_button = QPushButton("Load")
+        self.safe_button = QPushButton("Safe")
+        self.text_edit = QPlainTextEdit()
+        self.line_numbers = QTextEdit()
+        self.terminal = QTextEdit()
+        self.selection = QTextEdit.ExtraSelection()
         self.ui_init()
+
         self.A = Register_16_bit('A')
         self.B = Register_16_bit('B')
         self.C = Register_16_bit('C')
@@ -20,38 +29,37 @@ class MainWindow(QWidget):
         self.step_num = 0
 
     def ui_init(self):
-        self.run_button = QPushButton("Run")
-        self.step_button = QPushButton("Step")
-        self.load_button = QPushButton("Load")
-        self.safe_button = QPushButton("Safe")
         self.run_button.clicked.connect(self.run)
         self.step_button.clicked.connect(self.step)
         self.load_button.clicked.connect(self.load)
         self.safe_button.clicked.connect(self.safe)
 
-        self.text_edit = QPlainTextEdit()
         self.text_edit.setPlainText('ADD A, B\nMOV BH, CH\nSUB C, D\nADD D, A')
 
-        self.line_numbers = QTextEdit()
         self.line_numbers.setReadOnly(True)
         self.line_numbers.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.line_numbers.setFixedWidth(30)
         self.line_numbers.setPlainText('1')
 
-        self.selection = QTextEdit.ExtraSelection()
+        self.terminal.setReadOnly(True)
+
         self.selection.format.setBackground(QColor('#616161'))
         self.selection.format.setProperty(QTextFormat.FullWidthSelection, True)
 
-        button_layout = QVBoxLayout()
+        button_layout = QHBoxLayout()
         button_layout.addWidget(self.run_button)
         button_layout.addWidget(self.step_button)
         button_layout.addWidget(self.load_button)
         button_layout.addWidget(self.safe_button)
 
-        main_layout = QHBoxLayout()
+        text_layout = QHBoxLayout()
+        text_layout.addWidget(self.line_numbers)
+        text_layout.addWidget(self.text_edit)
+
+        main_layout = QVBoxLayout()
         main_layout.addLayout(button_layout)
-        main_layout.addWidget(self.line_numbers)
-        main_layout.addWidget(self.text_edit)
+        main_layout.addLayout(text_layout)
+        main_layout.addWidget(self.terminal)
         self.setLayout(main_layout)
 
         self.update_line_numbers()
@@ -125,7 +133,7 @@ class MainWindow(QWidget):
             case 'D':
                 firs_attribute = self.D
             case _:
-                raise AttributeError('zly rejestr')
+                self.terminal.append('zly rejestr')
 
         if len(commands[1]) == 2:
             match commands[1][1]:
@@ -134,7 +142,7 @@ class MainWindow(QWidget):
                 case 'H':
                     firs_attribute = firs_attribute.H
                 case _:
-                    raise AttributeError('zly rejestr')
+                    self.terminal.append('zly rejestr')
 
         # second atribute
         is_register = True
@@ -151,9 +159,9 @@ class MainWindow(QWidget):
             case '#':
                 is_register = False
                 second_attribute = [int(bit) for bit in commands[2][1:]]
-                print(second_attribute)
+                self.terminal.append(second_attribute)
             case _:
-                raise AttributeError('zly rejestr')
+                self.terminal.append('zly rejestr')
 
         if is_register and len(commands[2]) == 2:
             match commands[2][1]:
@@ -162,29 +170,29 @@ class MainWindow(QWidget):
                 case 'H':
                     second_attribute = second_attribute.H
                 case _:
-                    raise AttributeError('zly rejestr')
+                    self.terminal.append('zly rejestr')
 
-        print(f'First attribute: {firs_attribute.name}')
+        self.terminal.append(f'First attribute: {firs_attribute.name}')
         if type(second_attribute) == list:
-            print(f'Second attribute: {second_attribute}')
+            self.terminal.append(f'Second attribute: {second_attribute}')
         else:
-            print(f'Second attribute: {second_attribute.name}')
+            self.terminal.append(f'Second attribute: {second_attribute.name}')
         # command
         match commands[0]:
             case 'ADD':
-                print('Command: ADD')
+                self.terminal.append('Command: ADD')
                 ADD(firs_attribute, second_attribute)
-                print(f'register {firs_attribute.name} value: ', firs_attribute.register())
+                self.terminal.append(f'Register {firs_attribute.name} value: {firs_attribute.register()}\n')
             case 'SUB':
-                print('Command: SUB')
+                self.terminal.append('Command: SUB')
                 SUB(firs_attribute, second_attribute)
-                print(f'register {firs_attribute.name} value: ', firs_attribute.register())
+                self.terminal.append(f'Register {firs_attribute.name} value: {firs_attribute.register()}\n', )
             case 'MOV':
-                print('Command: MOV')
+                self.terminal.append('Command: MOV')
                 MOV(firs_attribute, second_attribute)
-                print(f'register {firs_attribute.name} value: ', firs_attribute.register())
+                self.terminal.append(f'Register {firs_attribute.name} value: {firs_attribute.register()}\n')
             case _:
-                raise AttributeError('zla komenda')
+                self.terminal.append('zla komenda')
 
 
 if __name__ == "__main__":
